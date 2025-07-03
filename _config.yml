@@ -1,0 +1,40 @@
+# GitHub Pages Configuration
+title: AI Selfie Prompt Generator
+description: Transform passport photos into authentic selfies with AI precision. Built for Black Forest Lab Flux/Konflux models.
+url: "https://aaronvstory.github.io"
+baseurl: "/ai-selfie-prompt-generator"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# GitHub Pages specific settings
+github:
+  repository_url: https://github.com/aaronvstory/ai-selfie-prompt-generator
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - .gitignore
+  - LICENSE
+
+# Include specific files
+include:
+  - index.html
+
+# Plugin settings (GitHub Pages supported plugins)
+plugins:
+  - jekyll-github-metadata
+
+# SEO settings
+author: Aaron Story
+twitter:
+  username: aaronvstory
+social:
+  name: Aaron Story
+  links:
+    - https://github.com/aaronvstory
+
+# Additional metadata
+lang: en_US
+timezone: America/New_York 
