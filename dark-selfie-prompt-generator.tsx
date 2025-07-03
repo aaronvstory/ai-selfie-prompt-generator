@@ -222,7 +222,7 @@ const DarkSelfiePromptGenerator = () => {
               </h3>
               <div className="grid grid-cols-2 gap-6">
                                                         {[
-                                            { value: 'landscape', label: 'Landscape', icon: '📺', desc: 'Wide format' },
+                                            { value: 'landscape', label: 'Landscape', icon: '🖥️', desc: 'Wide format' },
                                             { value: 'portrait', label: 'Portrait', icon: '📲', desc: 'Tall format' }
                 ].map((option) => (
                   <label
