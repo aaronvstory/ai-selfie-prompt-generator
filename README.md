@@ -138,6 +138,32 @@ MIT License - see [LICENSE](LICENSE) for details.
 - 💡 **Feature Requests**: [Submit ideas](https://github.com/aaronvstory/ai-selfie-prompt-generator/discussions)
 - 💬 **Questions**: [Join discussions](https://github.com/aaronvstory/ai-selfie-prompt-generator/discussions)
 
+## 🚀 **Future Roadmap**
+
+### 🎬 **Comprehensive AI Prompt Generator**
+This project is evolving into a **complete AI prompt generation suite** for multiple generative AI platforms:
+
+#### 📋 **Planned Features**
+- **🎥 Video Generation**: Optimized prompts for **Kling AI**, **RunwayML**, **Pika Labs**
+- **🎨 Advanced Image Models**: **DALL-E 3**, **Midjourney**, **Stable Diffusion XL**
+- **🎵 Audio Generation**: **ElevenLabs**, **Suno AI**, **MusicGen**
+- **💬 Text Generation**: **Claude**, **GPT-4**, **Gemini** optimization
+- **🔧 Custom Model Support**: User-defined prompt templates
+- **📊 Prompt Analytics**: Success rate tracking and optimization suggestions
+- **🎮 Interactive Previews**: Real-time prompt visualization
+- **📱 Mobile App**: Native iOS/Android applications
+- **🔗 API Integration**: Direct connection to AI platforms
+- **👥 Community Features**: Shared prompt libraries and ratings
+
+#### 🗓️ **Development Timeline**
+- **Q2 2025**: Video prompt generation for Kling AI and RunwayML
+- **Q3 2025**: Multi-modal support (image + video + audio)
+- **Q4 2025**: Mobile app launch and API integrations
+- **2026**: Full community platform with advanced analytics
+
+### 🎯 **Vision**
+Become the **ultimate AI prompt engineering tool** that democratizes access to high-quality generative AI across all platforms and modalities.
+
 ## 🔗 **Links**
 
 - 🌐 **Live Demo**: [aaronvstory.github.io/ai-selfie-prompt-generator](https://aaronvstory.github.io/ai-selfie-prompt-generator/)
