@@ -50,26 +50,25 @@ The **AI Selfie Prompt Generator** is a specialized tool designed to create high
 | Category | Options | Count |
 |----------|---------|-------|
 | Gender Styles | Universal, Male, Female | 3 |
-| Orientations | Portrait, Landscape | 2 |
-| Selfie Styles | One-handed, Two-handed | 2 |
+| Output Dimensions | Portrait (896x1152), Landscape (1152x896) | 2 |
+| Camera Lens/Style | Standard, 0.5x Ultra-Wide, Mirror Selfie | 3 |
 | Backgrounds | Indoor, Outdoor, Urban | 12 |
-| Lighting | Various conditions | 7 |
+| Lighting | Scene-compatible lighting presets | 7 |
 | T-shirt Colors | Color palette | 8 |
-| **Total Combinations** | | **4,032** |
+| **Total Combinations** | Context-aware based on background/lighting compatibility | Variable |
 
 ## 🎮 **Usage Tips**
 
 ### 🎨 **Best Practices**
-- **Mix backgrounds and lighting** for varied results
-- **Try different selfie styles** for pose variety
-- **Experiment with colors** for contrast optimization
-- **Use one-handed for natural** casual selfies
-- **Use two-handed for dynamic** creative poses
+- **Use camera lens styles intentionally**: standard for natural shots, 0.5x for playful distortion, mirror for phone-visible selfies
+- **Pick background first** so compatible lighting options stay realistic
+- **Use orientation for API dimensions** (not prompt text) to avoid format confusion in FLUX
+- **Experiment with shirt colors** for better subject/background contrast
 
 ### 🚫 **Avoiding Issues**
-- The generator includes **built-in imperfections** to prevent AI detection
-- **Front-camera specifications** ensure realistic smartphone quality
-- **Identity preservation prompts** maintain facial features from reference
+- The generator uses **descriptive captions** instead of instruction-style prompts
+- **Scene-matched lighting** prevents contradictory environment cues
+- **Raw iPhone 15 aesthetic keywords** reduce the glossy AI look
 
 ## 🛠️ **Getting Started**
 

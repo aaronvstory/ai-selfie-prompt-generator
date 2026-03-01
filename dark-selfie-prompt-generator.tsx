@@ -1,6 +1,201 @@
 // @ts-ignore - React loaded via CDN in browser
 import React, { useState } from 'react';
 
+const orientationDimensions = {
+  landscape: { width: 1152, height: 896, label: '1152 x 896' },
+  portrait: { width: 896, height: 1152, label: '896 x 1152' }
+};
+
+const genderStyles = {
+  neutral: {
+    subject: '30-year-old person',
+    expression: 'They have a candid, unposed expression with a subtle natural smile'
+  },
+  male: {
+    subject: '30-year-old man',
+    expression: 'He has a candid, relaxed expression with a subtle natural smile'
+  },
+  female: {
+    subject: '30-year-old woman',
+    expression: 'She has a candid, warm expression with a subtle natural smile'
+  }
+};
+
+const cameraStyleOptions = [
+  {
+    value: 'standard_selfie',
+    label: 'Standard Selfie',
+    desc: 'Arm extended, phone out of frame',
+    icon: '🤳',
+    intro: 'A raw, unedited iPhone 15 front-camera selfie',
+    pose: 'One arm is extended holding the camera just out of frame.'
+  },
+  {
+    value: 'ultrawide_selfie',
+    label: '0.5x Ultra-Wide Angle',
+    desc: 'Distorted, playful Gen-Z look',
+    icon: '🌀',
+    intro: 'A raw, unedited iPhone 15 front-camera 0.5x ultra-wide selfie',
+    pose: 'One arm is extended close to the lens, creating natural edge distortion.'
+  },
+  {
+    value: 'mirror_selfie',
+    label: 'Mirror Selfie',
+    desc: 'Phone visible in hand',
+    icon: '🪞',
+    intro: 'A raw, unedited mirror selfie shot on an iPhone 15',
+    pose: 'The phone is visible in one hand, captured naturally in the mirror.'
+  }
+];
+
+const backgroundOptions = [
+  {
+    value: 'cozy_bedroom',
+    label: '🛏️ Cozy Bedroom',
+    category: 'Indoor',
+    scene: 'a cozy bedroom with lived-in details',
+    defaultLighting: 'indoor_warm',
+    lightingOptions: ['indoor_warm', 'indoor_window']
+  },
+  {
+    value: 'modern_kitchen',
+    label: '🍳 Modern Kitchen',
+    category: 'Indoor',
+    scene: 'a modern kitchen with everyday clutter',
+    defaultLighting: 'indoor_window',
+    lightingOptions: ['indoor_window', 'indoor_warm']
+  },
+  {
+    value: 'coffee_shop',
+    label: '☕ Coffee Shop',
+    category: 'Indoor',
+    scene: 'a bustling indoor coffee shop',
+    defaultLighting: 'indoor_ambient',
+    lightingOptions: ['indoor_ambient', 'indoor_window']
+  },
+  {
+    value: 'home_office',
+    label: '💻 Home Office',
+    category: 'Indoor',
+    scene: 'a home office desk setup',
+    defaultLighting: 'indoor_window',
+    lightingOptions: ['indoor_window', 'indoor_warm']
+  },
+  {
+    value: 'living_room',
+    label: '🛋️ Living Room',
+    category: 'Indoor',
+    scene: 'a lived-in living room during the day',
+    defaultLighting: 'indoor_window',
+    lightingOptions: ['indoor_window', 'indoor_warm']
+  },
+  {
+    value: 'restaurant_booth',
+    label: '🍽️ Restaurant Booth',
+    category: 'Indoor',
+    scene: 'a casual restaurant booth',
+    defaultLighting: 'indoor_ambient',
+    lightingOptions: ['indoor_ambient', 'indoor_warm']
+  },
+  {
+    value: 'park',
+    label: '🌳 Park Setting',
+    category: 'Outdoor',
+    scene: 'an outdoor park setting with trees',
+    defaultLighting: 'outdoor_overcast',
+    lightingOptions: ['outdoor_sunny', 'outdoor_overcast', 'outdoor_golden']
+  },
+  {
+    value: 'city_balcony',
+    label: '🏙️ City Balcony',
+    category: 'Outdoor',
+    scene: 'an outdoor balcony with a city view',
+    defaultLighting: 'outdoor_sunny',
+    lightingOptions: ['outdoor_sunny', 'outdoor_overcast', 'outdoor_golden']
+  },
+  {
+    value: 'backyard_patio',
+    label: '☀️ Backyard Patio',
+    category: 'Outdoor',
+    scene: 'a sunny backyard patio',
+    defaultLighting: 'outdoor_sunny',
+    lightingOptions: ['outdoor_sunny', 'outdoor_overcast', 'outdoor_golden']
+  },
+  {
+    value: 'beach_lakeside',
+    label: '🏖️ Beach/Lakeside',
+    category: 'Outdoor',
+    scene: 'an outdoor beach or lakeside location',
+    defaultLighting: 'outdoor_sunny',
+    lightingOptions: ['outdoor_sunny', 'outdoor_overcast', 'outdoor_golden']
+  },
+  {
+    value: 'car_interior',
+    label: '🚗 Car Interior',
+    category: 'Vehicle/Urban',
+    scene: 'a parked car interior',
+    defaultLighting: 'vehicle_mixed',
+    lightingOptions: ['vehicle_mixed', 'outdoor_sunny', 'outdoor_overcast']
+  },
+  {
+    value: 'urban_rooftop',
+    label: '🏢 Urban Rooftop',
+    category: 'Vehicle/Urban',
+    scene: 'an urban rooftop with city structures',
+    defaultLighting: 'outdoor_golden',
+    lightingOptions: ['outdoor_sunny', 'outdoor_overcast', 'outdoor_golden']
+  }
+];
+
+const lightingOptions = [
+  {
+    value: 'indoor_warm',
+    label: '💡 Warm Indoor Practical Lighting',
+    prompt: 'warm practical indoor lighting'
+  },
+  {
+    value: 'indoor_window',
+    label: '🪟 Soft Natural Window Light',
+    prompt: 'soft natural window light hitting one side of the face'
+  },
+  {
+    value: 'indoor_ambient',
+    label: '☕ Ambient Indoor Lighting',
+    prompt: 'ambient indoor lighting from the surrounding space'
+  },
+  {
+    value: 'outdoor_sunny',
+    label: '☀️ Bright Natural Daylight',
+    prompt: 'bright natural daylight'
+  },
+  {
+    value: 'outdoor_overcast',
+    label: '☁️ Soft Overcast Daylight',
+    prompt: 'soft overcast daylight'
+  },
+  {
+    value: 'outdoor_golden',
+    label: '🌅 Golden Hour Sunlight',
+    prompt: 'warm golden-hour sunlight'
+  },
+  {
+    value: 'vehicle_mixed',
+    label: '🚘 Mixed Window Light',
+    prompt: 'mixed city light passing through the windows'
+  }
+];
+
+const tshirtColors = [
+  { value: 'navy blue', label: 'Navy Blue', color: '#1e3a8a' },
+  { value: 'black', label: 'Black', color: '#000000' },
+  { value: 'white', label: 'White', color: '#ffffff' },
+  { value: 'gray', label: 'Gray', color: '#6b7280' },
+  { value: 'forest green', label: 'Forest Green', color: '#065f46' },
+  { value: 'burgundy', label: 'Burgundy', color: '#7c2d12' },
+  { value: 'charcoal', label: 'Charcoal', color: '#374151' },
+  { value: 'olive', label: 'Olive', color: '#365314' }
+];
+
 const DarkSelfiePromptGenerator = () => {
   const [formData, setFormData] = useState({
     gender: 'neutral',
@@ -8,128 +203,95 @@ const DarkSelfiePromptGenerator = () => {
     background: '',
     lighting: '',
     tshirt: 'navy blue',
-    selfie_style: 'one_handed'
+    camera_style: 'standard_selfie'
   });
-  
+
   const [generatedPrompt, setGeneratedPrompt] = useState('');
+  const [generatedPayload, setGeneratedPayload] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [copyMessage, setCopyMessage] = useState(false);
+  const [copyMessage, setCopyMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const promptTemplates = {
-    neutral: {
-      landscape: {
-        one_handed: `Transform this passport photo into a natural selfie: Person wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with one arm extended but phone not visible in frame, looking directly at camera with a subtle natural smile. Shot in landscape orientation zoomed out to show head centered with extensive space around all sides. Full torso and shoulders visible with significant background space above, below, and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight blemishes, casual messy hair, wrinkled clothing, candid unposed expression. Other arm relaxed at side, natural one-handed selfie pose. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`,
-        
-        two_handed: `Transform this passport photo into a natural selfie: Person wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with both arms visible in frame, looking directly at camera with a subtle natural smile. Shot in landscape orientation zoomed out to show head centered with extensive space around all sides. Full torso and shoulders visible with significant background space above, below, and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight blemishes, casual messy hair, wrinkled clothing, candid unposed expression. Both arms extended naturally showing hands and forearms in frame. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`
-      },
-      
-      portrait: {
-        one_handed: `Transform this passport photo into a natural selfie: Person wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with one arm extended but phone not visible in frame, looking directly at camera with a subtle natural smile. Shot in portrait orientation zoomed out to show head centered with extensive space around all sides. Full torso visible with significant background space above and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight blemishes, casual messy hair, wrinkled clothing, candid unposed expression. Other arm relaxed at side, natural one-handed selfie pose. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`,
-        
-        two_handed: `Transform this passport photo into a natural selfie: Person wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with both arms visible in frame, looking directly at camera with a subtle natural smile. Shot in portrait orientation zoomed out to show head centered with extensive space around all sides. Full torso visible with significant background space above and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight blemishes, casual messy hair, wrinkled clothing, candid unposed expression. Both arms extended naturally showing hands and forearms in frame. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`
-      }
-    },
-    
-    male: {
-      landscape: {
-        one_handed: `Transform this passport photo into a natural male selfie: Man wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with one arm extended but phone not visible in frame, looking directly at camera with a confident, relaxed expression. Shot in landscape orientation zoomed out to show head centered with extensive space around all sides. Full torso and shoulders visible with significant background space above, below, and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight stubble, casual messy hair, wrinkled clothing, candid masculine expression. Other arm relaxed at side, natural one-handed selfie pose. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`,
-        
-        two_handed: `Transform this passport photo into a natural male selfie: Man wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with both arms visible in frame, looking directly at camera with a confident, relaxed expression. Shot in landscape orientation zoomed out to show head centered with extensive space around all sides. Full torso and shoulders visible with significant background space above, below, and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight stubble, casual messy hair, wrinkled clothing, candid masculine expression. Both arms extended naturally showing hands and forearms in frame. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`
-      },
-      
-      portrait: {
-        one_handed: `Transform this passport photo into a natural male selfie: Man wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with one arm extended but phone not visible in frame, looking directly at camera with a confident, relaxed expression. Shot in portrait orientation zoomed out to show head centered with extensive space around all sides. Full torso visible with significant background space above and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight stubble, casual messy hair, wrinkled clothing, candid masculine expression. Other arm relaxed at side, natural one-handed selfie pose. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`,
-        
-        two_handed: `Transform this passport photo into a natural male selfie: Man wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with both arms visible in frame, looking directly at camera with a confident, relaxed expression. Shot in portrait orientation zoomed out to show head centered with extensive space around all sides. Full torso visible with significant background space above and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and slight stubble, casual messy hair, wrinkled clothing, candid masculine expression. Both arms extended naturally showing hands and forearms in frame. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`
-      }
-    },
-    
-    female: {
-      landscape: {
-        one_handed: `Transform this passport photo into a natural female selfie: Woman wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with one arm extended but phone not visible in frame, looking directly at camera with a warm, natural smile. Shot in landscape orientation zoomed out to show head centered with extensive space around all sides. Full torso and shoulders visible with significant background space above, below, and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and minimal makeup, casual messy hair, wrinkled clothing, candid feminine expression. Other arm relaxed at side, natural one-handed selfie pose. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`,
-        
-        two_handed: `Transform this passport photo into a natural female selfie: Woman wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with both arms visible in frame, looking directly at camera with a warm, natural smile. Shot in landscape orientation zoomed out to show head centered with extensive space around all sides. Full torso and shoulders visible with significant background space above, below, and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and minimal makeup, casual messy hair, wrinkled clothing, candid feminine expression. Both arms extended naturally showing hands and forearms in frame. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`
-      },
-      
-      portrait: {
-        one_handed: `Transform this passport photo into a natural female selfie: Woman wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with one arm extended but phone not visible in frame, looking directly at camera with a warm, natural smile. Shot in portrait orientation zoomed out to show head centered with extensive space around all sides. Full torso visible with significant background space above and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and minimal makeup, casual messy hair, wrinkled clothing, candid feminine expression. Other arm relaxed at side, natural one-handed selfie pose. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`,
-        
-        two_handed: `Transform this passport photo into a natural female selfie: Woman wearing a casual {tshirt} t-shirt, taking a front-facing camera selfie with both arms visible in frame, looking directly at camera with a warm, natural smile. Shot in portrait orientation zoomed out to show head centered with extensive space around all sides. Full torso visible with significant background space above and around subject. Background: {background}. Lighting: {lighting}. Authentic front-facing smartphone camera quality with slight motion blur, natural skin imperfections, uneven lighting, slightly off-center composition. Include realistic flaws: minor focus issues, natural skin texture with pores and minimal makeup, casual messy hair, wrinkled clothing, candid feminine expression. Both arms extended naturally showing hands and forearms in frame. Maintain exact facial features, bone structure, and identity from reference image. Raw unfiltered smartphone selfie aesthetic with imperfect framing and natural shadows.`
-      }
-    }
-  };
-
-  const backgroundOptions = [
-    { value: 'cozy bedroom with warm lamp lighting', label: '🛏️ Cozy Bedroom', category: 'Indoor' },
-    { value: 'modern kitchen with natural window light', label: '🍳 Modern Kitchen', category: 'Indoor' },
-    { value: 'coffee shop with ambient lighting', label: '☕ Coffee Shop', category: 'Indoor' },
-    { value: 'home office with desk lamp', label: '💻 Home Office', category: 'Indoor' },
-    { value: 'living room during day', label: '🛋️ Living Room', category: 'Indoor' },
-    { value: 'restaurant booth', label: '🍽️ Restaurant Booth', category: 'Indoor' },
-    { value: 'outdoor park setting with trees', label: '🌳 Park Setting', category: 'Outdoor' },
-    { value: 'outdoor balcony with city view', label: '🏙️ City Balcony', category: 'Outdoor' },
-    { value: 'sunny backyard patio', label: '☀️ Backyard Patio', category: 'Outdoor' },
-    { value: 'outdoor beach or lakeside', label: '🏖️ Beach/Lakeside', category: 'Outdoor' },
-    { value: 'car interior', label: '🚗 Car Interior', category: 'Vehicle/Urban' },
-    { value: 'urban rooftop', label: '🏢 Urban Rooftop', category: 'Vehicle/Urban' }
-  ];
-
-  const lightingOptions = [
-    { value: 'bright sunny day', label: '☀️ Bright Sunny Day' },
-    { value: 'soft overcast lighting', label: '☁️ Soft Overcast' },
-    { value: 'golden hour warm glow', label: '🌅 Golden Hour' },
-    { value: 'indoor warm lighting', label: '💡 Indoor Warm Light' },
-    { value: 'natural window light', label: '🪟 Natural Window Light' },
-    { value: 'soft morning light', label: '🌄 Soft Morning Light' },
-    { value: 'evening ambient lighting', label: '🌆 Evening Ambient' }
-  ];
-
-  const tshirtColors = [
-    { value: 'navy blue', label: 'Navy Blue', color: '#1e3a8a' },
-    { value: 'black', label: 'Black', color: '#000000' },
-    { value: 'white', label: 'White', color: '#ffffff' },
-    { value: 'gray', label: 'Gray', color: '#6b7280' },
-    { value: 'forest green', label: 'Forest Green', color: '#065f46' },
-    { value: 'burgundy', label: 'Burgundy', color: '#7c2d12' },
-    { value: 'charcoal', label: 'Charcoal', color: '#374151' },
-    { value: 'olive', label: 'Olive', color: '#365314' }
-  ];
-
   const handleInputChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => {
+      if (name === 'background') {
+        const selectedBackground = backgroundOptions.find((option) => option.value === value);
+        if (!selectedBackground) {
+          return { ...prev, background: value };
+        }
+
+        const lightingStillCompatible = selectedBackground.lightingOptions.includes(prev.lighting);
+        return {
+          ...prev,
+          background: value,
+          lighting: lightingStillCompatible ? prev.lighting : selectedBackground.defaultLighting
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: value
+      };
+    });
   };
+
+  const selectedBackgroundOption = backgroundOptions.find(
+    (option) => option.value === formData.background
+  );
+
+  const compatibleLightingOptions = selectedBackgroundOption
+    ? lightingOptions.filter((option) =>
+        selectedBackgroundOption.lightingOptions.includes(option.value)
+      )
+    : lightingOptions;
 
   const generatePrompt = () => {
     if (!formData.background || !formData.lighting) {
-      alert('Please select both background and lighting options.');
+      alert('Please select a background first (lighting will auto-align to the scene).');
       return;
     }
 
+    const selectedGender = genderStyles[formData.gender];
+    const selectedCameraStyle =
+      cameraStyleOptions.find((option) => option.value === formData.camera_style) ||
+      cameraStyleOptions[0];
+    const selectedBackground =
+      backgroundOptions.find((option) => option.value === formData.background) ||
+      backgroundOptions[0];
+    const selectedLighting =
+      lightingOptions.find((option) => option.value === formData.lighting) || lightingOptions[0];
+    const selectedDimensions = orientationDimensions[formData.orientation];
+
     setIsGenerating(true);
-    
+
     setTimeout(() => {
-      const template = promptTemplates[formData.gender][formData.orientation][formData.selfie_style];
-      
-      const prompt = template
-        .replace('{tshirt}', formData.tshirt)
-        .replace('{background}', formData.background)
-        .replace('{lighting}', formData.lighting);
-      
+      const prompt = [
+        `${selectedCameraStyle.intro} of a ${selectedGender.subject} wearing a casual ${formData.tshirt} t-shirt.`,
+        `${selectedGender.expression}.`,
+        `${selectedCameraStyle.pose}`,
+        `The background is ${selectedBackground.scene}.`,
+        `The scene is illuminated by ${selectedLighting.prompt}.`,
+        'Amateur photography aesthetic, slightly off-center composition, natural skin texture with visible pores and slight blemishes, casual messy hair, minor motion blur on the edges of the frame, unfiltered iPhone 15 quality.'
+      ].join(' ');
+
+      const payload = {
+        prompt,
+        width: selectedDimensions.width,
+        height: selectedDimensions.height
+      };
+
       setGeneratedPrompt(prompt);
+      setGeneratedPayload(JSON.stringify(payload, null, 2));
       setShowResults(true);
       setIsGenerating(false);
-    }, 1200);
+    }, 800);
   };
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (text, label) => {
     try {
-      await navigator.clipboard.writeText(generatedPrompt);
-      setCopyMessage(true);
-      setTimeout(() => setCopyMessage(false), 3000);
+      await navigator.clipboard.writeText(text);
+      setCopyMessage(`${label} copied to clipboard successfully.`);
+      setTimeout(() => setCopyMessage(''), 3000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -138,6 +300,8 @@ const DarkSelfiePromptGenerator = () => {
   const resetForm = () => {
     setShowResults(false);
     setGeneratedPrompt('');
+    setGeneratedPayload('');
+    setCopyMessage('');
   };
 
   const groupedBackgrounds = backgroundOptions.reduce((acc, option) => {
@@ -151,7 +315,6 @@ const DarkSelfiePromptGenerator = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 p-4">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="bg-gray-800/90 backdrop-blur-lg border border-gray-700/50 rounded-3xl p-8 mb-6 text-center shadow-2xl">
           <div className="flex items-center justify-center gap-4 mb-4">
             <div className="text-5xl animate-pulse">📸</div>
@@ -159,26 +322,26 @@ const DarkSelfiePromptGenerator = () => {
               AI Selfie Prompt Generator
             </h1>
           </div>
-          <p className="text-gray-300 text-xl font-light">Transform passport photos into authentic selfies with AI precision</p>
+          <p className="text-gray-300 text-xl font-light">
+            Describe natural selfies for FLUX + PuLID without contradictory prompt fragments
+          </p>
           <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-400">
-            <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full">✨ For Flux/Konflux</span>
-            <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full">🚀 Authentic Results</span>
+            <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full">✨ FLUX + PuLID Ready</span>
+            <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full">📱 iPhone 15 Aesthetic</span>
           </div>
         </div>
 
-        {/* Main Form */}
         <div className="bg-gray-800/90 backdrop-blur-lg border border-gray-700/50 rounded-3xl p-8 shadow-2xl">
           <div className="space-y-10">
-            {/* Gender Selection */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
                 <span className="text-cyan-400">👤</span> Gender Style
               </h3>
               <div className="grid gap-4">
                 {[
-                  { value: 'neutral', label: 'Universal', desc: 'Gender-neutral prompts for all', icon: '🌐' },
-                  { value: 'male', label: 'Male', desc: 'Masculine expressions & confident poses', icon: '👨' },
-                  { value: 'female', label: 'Female', desc: 'Feminine expressions & natural poses', icon: '👩' }
+                  { value: 'neutral', label: 'Universal', desc: 'Balanced body language and fit cues', icon: '🌐' },
+                  { value: 'male', label: 'Male', desc: 'Masculine framing and clothing fit cues', icon: '👨' },
+                  { value: 'female', label: 'Female', desc: 'Feminine framing and clothing fit cues', icon: '👩' }
                 ].map((option) => (
                   <label
                     key={option.value}
@@ -215,15 +378,24 @@ const DarkSelfiePromptGenerator = () => {
               </div>
             </div>
 
-            {/* Orientation Selection */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
-                <span className="text-cyan-400">📱</span> Image Orientation
+                <span className="text-cyan-400">📐</span> Output Dimensions (API Payload)
               </h3>
               <div className="grid grid-cols-2 gap-6">
-                                                        {[
-                                            { value: 'landscape', label: 'Landscape', icon: '🖥️', desc: 'Wide format' },
-                                            { value: 'portrait', label: 'Portrait', icon: '📲', desc: 'Tall format' }
+                {[
+                  {
+                    value: 'landscape',
+                    label: 'Landscape',
+                    icon: '🖥️',
+                    desc: `${orientationDimensions.landscape.label} (width x height)`
+                  },
+                  {
+                    value: 'portrait',
+                    label: 'Portrait',
+                    icon: '📲',
+                    desc: `${orientationDimensions.portrait.label} (width x height)`
+                  }
                 ].map((option) => (
                   <label
                     key={option.value}
@@ -243,47 +415,45 @@ const DarkSelfiePromptGenerator = () => {
                     />
                     <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">{option.icon}</div>
                     <div className="font-bold text-white text-xl mb-1">{option.label}</div>
-                    <div className="text-gray-300 text-sm">{option.desc}</div>
+                    <div className="text-gray-300 text-sm text-center">{option.desc}</div>
                   </label>
                 ))}
               </div>
+              <p className="text-sm text-cyan-200/80 bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-4 py-3">
+                Orientation controls API dimensions only and is intentionally excluded from the prompt text.
+              </p>
             </div>
 
-            {/* Selfie Style */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
-                <span className="text-cyan-400">✋</span> Selfie Style
+                <span className="text-cyan-400">📷</span> Camera Lens / Style
               </h3>
-              <div className="grid grid-cols-2 gap-6">
-                {[
-                  { value: 'one_handed', label: 'One-Handed', desc: 'Natural single-arm selfie pose', icon: '☝️' },
-                  { value: 'two_handed', label: 'Two-Handed', desc: 'Both hands visible in frame', icon: '🙌' }
-                ].map((option) => (
+              <div className="grid md:grid-cols-3 gap-6">
+                {cameraStyleOptions.map((option) => (
                   <label
                     key={option.value}
                     className={`group flex flex-col items-center p-8 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-105 ${
-                      formData.selfie_style === option.value
+                      formData.camera_style === option.value
                         ? 'border-cyan-500 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 shadow-lg shadow-cyan-500/20'
                         : 'border-gray-600 bg-gray-700/30'
                     }`}
                   >
                     <input
                       type="radio"
-                      name="selfie_style"
+                      name="camera_style"
                       value={option.value}
-                      checked={formData.selfie_style === option.value}
-                      onChange={(e) => handleInputChange('selfie_style', e.target.value)}
+                      checked={formData.camera_style === option.value}
+                      onChange={(e) => handleInputChange('camera_style', e.target.value)}
                       className="sr-only"
                     />
                     <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">{option.icon}</div>
-                    <div className="font-bold text-white text-xl mb-1">{option.label}</div>
+                    <div className="font-bold text-white text-xl mb-1 text-center">{option.label}</div>
                     <div className="text-gray-300 text-sm text-center">{option.desc}</div>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Background Selection */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
                 <span className="text-cyan-400">🖼️</span> Background Setting
@@ -308,7 +478,6 @@ const DarkSelfiePromptGenerator = () => {
               </select>
             </div>
 
-            {/* Lighting Selection */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
                 <span className="text-cyan-400">☀️</span> Lighting Condition
@@ -317,19 +486,28 @@ const DarkSelfiePromptGenerator = () => {
                 value={formData.lighting}
                 onChange={(e) => handleInputChange('lighting', e.target.value)}
                 title="Select lighting condition for your selfie"
-                className="w-full p-5 border-2 border-gray-600 rounded-2xl focus:border-cyan-400 focus:outline-none bg-gray-700/50 text-white text-lg backdrop-blur-sm transition-all duration-300 hover:border-gray-500"
+                className="w-full p-5 border-2 border-gray-600 rounded-2xl focus:border-cyan-400 focus:outline-none bg-gray-700/50 text-white text-lg backdrop-blur-sm transition-all duration-300 hover:border-gray-500 disabled:opacity-60 disabled:cursor-not-allowed"
                 required
+                disabled={!formData.background}
               >
-                <option value="" className="bg-gray-800">Choose lighting condition...</option>
-                {lightingOptions.map((option) => (
+                <option value="" className="bg-gray-800">
+                  {formData.background
+                    ? 'Choose compatible lighting...'
+                    : 'Choose a background first...'}
+                </option>
+                {compatibleLightingOptions.map((option) => (
                   <option key={option.value} value={option.value} className="bg-gray-800">
                     {option.label}
                   </option>
                 ))}
               </select>
+              {selectedBackgroundOption && (
+                <p className="text-sm text-gray-300">
+                  Lighting is filtered to match <span className="text-cyan-300 font-semibold">{selectedBackgroundOption.label}</span> so the prompt stays consistent.
+                </p>
+              )}
             </div>
 
-            {/* T-shirt Color Selection */}
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
                 <span className="text-cyan-400">👕</span> T-shirt Color
@@ -352,19 +530,18 @@ const DarkSelfiePromptGenerator = () => {
                       onChange={(e) => handleInputChange('tshirt', e.target.value)}
                       className="sr-only"
                     />
-                                                                    <div
-                                                    className={`w-8 h-8 rounded-xl border-2 mr-3 flex-shrink-0 transition-transform group-hover:scale-110 ${
-                                                        color.value === 'white' ? 'border-gray-400' : 'border-gray-500'
-                                                    }`}
-                                                    style={{ backgroundColor: color.color }} // eslint-disable-line react/forbid-component-props
-                                                ></div>
+                    <div
+                      className={`w-8 h-8 rounded-xl border-2 mr-3 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                        color.value === 'white' ? 'border-gray-400' : 'border-gray-500'
+                      }`}
+                      style={{ backgroundColor: color.color }} // eslint-disable-line react/forbid-component-props
+                    ></div>
                     <span className="text-white font-medium flex-1">{color.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
-            {/* Generate Button */}
             <button
               onClick={generatePrompt}
               disabled={isGenerating}
@@ -373,12 +550,12 @@ const DarkSelfiePromptGenerator = () => {
               {isGenerating ? (
                 <div className="flex items-center justify-center gap-3">
                   <div className="animate-spin w-6 h-6 border-3 border-white border-t-transparent rounded-full"></div>
-                  <span>Generating Magic...</span>
+                  <span>Building Prompt...</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-3">
                   <span className="text-2xl">✨</span>
-                  <span>Generate Prompt</span>
+                  <span>Generate Prompt + Payload</span>
                   <span className="text-2xl">🚀</span>
                 </div>
               )}
@@ -386,15 +563,15 @@ const DarkSelfiePromptGenerator = () => {
           </div>
         </div>
 
-        {/* Results Section */}
         {showResults && (
           <div className="bg-gray-800/90 backdrop-blur-lg border border-gray-700/50 rounded-3xl p-8 mt-6 shadow-2xl">
             <h3 className="text-2xl font-bold flex items-center gap-3 mb-6 text-white">
-              <span className="text-green-400">📋</span> Generated Prompt
+              <span className="text-green-400">📋</span> Generated Output
               <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-normal">Ready to Use</span>
             </h3>
             <div className="space-y-6">
               <div className="relative">
+                <label className="block text-sm font-semibold text-cyan-300 mb-2">FLUX Prompt</label>
                 <textarea
                   value={generatedPrompt}
                   readOnly
@@ -402,13 +579,31 @@ const DarkSelfiePromptGenerator = () => {
                   placeholder="Your generated prompt will appear here..."
                 />
               </div>
+
+              <div className="relative">
+                <label className="block text-sm font-semibold text-cyan-300 mb-2">Suggested API Payload (orientation applied as dimensions)</label>
+                <textarea
+                  value={generatedPayload}
+                  readOnly
+                  className="w-full h-40 p-6 border-2 border-gray-600 rounded-2xl bg-gray-900/50 text-gray-100 font-mono text-sm resize-none backdrop-blur-sm focus:border-cyan-400 transition-colors"
+                  placeholder="Payload preview will appear here..."
+                />
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={copyToClipboard}
+                  onClick={() => copyToClipboard(generatedPrompt, 'Prompt')}
                   className="flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-2xl font-bold hover:from-green-400 hover:to-emerald-500 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-green-500/25"
                 >
                   <span className="text-xl">📋</span>
-                  Copy to Clipboard
+                  Copy Prompt
+                </button>
+                <button
+                  onClick={() => copyToClipboard(generatedPayload, 'Payload JSON')}
+                  className="flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-600 to-blue-700 text-white px-8 py-4 rounded-2xl font-bold hover:from-cyan-500 hover:to-blue-600 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/25"
+                >
+                  <span className="text-xl">{'{ }'}</span>
+                  Copy Payload JSON
                 </button>
                 <button
                   onClick={resetForm}
@@ -421,25 +616,35 @@ const DarkSelfiePromptGenerator = () => {
               {copyMessage && (
                 <div className="flex items-center gap-3 bg-green-500/20 border border-green-500/30 text-green-400 p-4 rounded-2xl backdrop-blur-sm">
                   <span className="text-xl">✅</span>
-                  <span className="font-semibold">Prompt copied to clipboard successfully!</span>
+                  <span className="font-semibold">{copyMessage}</span>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* Footer */}
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-2xl p-6 mt-8 text-center">
           <p className="text-gray-400 text-lg">
-            © 2025 AI Selfie Prompt Generator | Built for 
+            © 2026 AI Selfie Prompt Generator | Built for
             <span className="text-cyan-400 font-semibold"> Black Forest Lab Flux/Konflux</span>
           </p>
           <div className="mt-2 flex items-center justify-center gap-4 text-sm text-gray-500">
-            <span>🎯 Precision Prompts</span>
+            <span>🎯 Descriptive FLUX Prompts</span>
             <span>•</span>
-            <span>🔥 Authentic Results</span>
+            <span>⚖️ Background/Lighting Alignment</span>
             <span>•</span>
-            <span>⚡ Lightning Fast</span>
+            <span>📐 API-Ready Dimensions</span>
+          </div>
+          <div className="mt-3">
+            <a
+              href="https://github.com/aaronvstory/ai-selfie-prompt-generator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105"
+            >
+              <span className="text-lg">⭐</span>
+              <span>View on GitHub</span>
+            </a>
           </div>
         </div>
       </div>
