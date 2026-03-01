@@ -52,17 +52,21 @@ The **AI Selfie Prompt Generator** is a specialized tool designed to create high
 | Gender Styles | Universal, Male, Female | 3 |
 | Output Dimensions | Portrait (896x1152), Landscape (1152x896) | 2 |
 | Camera Lens/Style | Standard, 0.5x Ultra-Wide, Mirror Selfie | 3 |
+| Mirror Context | Auto, Bathroom, Bedroom (mirror mode only) | 3 |
 | Backgrounds | Indoor, Outdoor, Urban | 12 |
 | Lighting | Scene-compatible lighting presets | 7 |
 | T-shirt Colors | Color palette | 8 |
+| Negative Prompt | Editable payload field | 1 |
 | **Total Combinations** | Scene-aware based on background/lighting compatibility | Variable |
 
 ## 🎮 **Usage Tips**
 
 ### 🎨 **Best Practices**
 - **Use camera lens styles intentionally**: standard for natural shots, 0.5x for playful distortion, mirror for phone-visible selfies
+- **Use mirror context** when in mirror mode to anchor geometry (bathroom or bedroom)
 - **Pick background first** so compatible lighting options stay realistic
 - **Use orientation for API dimensions** (not prompt text) to avoid format confusion in FLUX
+- **Use identity reinforcement only without PuLID** to avoid text-vs-reference conflicts
 - **Experiment with shirt colors** for better subject/background contrast
 
 ### 🚫 **Avoiding Issues**

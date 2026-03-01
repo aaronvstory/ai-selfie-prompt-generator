@@ -8,15 +8,15 @@ const orientationDimensions = {
 
 const genderStyles = {
   neutral: {
-    subject: '30-year-old person',
+    subject: 'adult person',
     expression: 'They have a candid, unposed expression with a subtle natural smile'
   },
   male: {
-    subject: '30-year-old man',
+    subject: 'adult man',
     expression: 'He has a candid, relaxed expression with a subtle natural smile'
   },
   female: {
-    subject: '30-year-old woman',
+    subject: 'adult woman',
     expression: 'She has a candid, warm expression with a subtle natural smile'
   }
 };
@@ -45,6 +45,24 @@ const cameraStyleOptions = [
     icon: '🪞',
     intro: 'A raw, unedited mirror selfie shot on an iPhone 15',
     pose: 'The phone is visible in one hand, captured naturally in the mirror.'
+  }
+];
+
+const mirrorContextOptions = [
+  {
+    value: 'auto',
+    label: 'Auto from Background',
+    prompt: 'The mirror context naturally matches the surrounding room.'
+  },
+  {
+    value: 'bathroom',
+    label: 'Bathroom Mirror',
+    prompt: 'The mirror is in a bathroom with realistic sink and countertop details.'
+  },
+  {
+    value: 'bedroom',
+    label: 'Bedroom Mirror',
+    prompt: 'The mirror is in a bedroom corner with casual home details.'
   }
 ];
 
@@ -203,7 +221,11 @@ const DarkSelfiePromptGenerator = () => {
     background: '',
     lighting: '',
     tshirt: 'navy blue',
-    camera_style: 'standard_selfie'
+    camera_style: 'standard_selfie',
+    mirror_context: 'auto',
+    identity_lock: false,
+    negative_prompt:
+      'no beauty filter, no airbrushed skin, no studio lighting, no HDR, no glam retouching'
   });
 
   const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -271,13 +293,17 @@ const DarkSelfiePromptGenerator = () => {
       (option) => option.value === formData.lighting
     );
     const selectedDimensions = orientationDimensions[formData.orientation];
+    const selectedMirrorContext = mirrorContextOptions.find(
+      (option) => option.value === formData.mirror_context
+    );
 
     if (
       !selectedGender ||
       !selectedCameraStyle ||
       !selectedBackground ||
       !selectedLighting ||
-      !selectedDimensions
+      !selectedDimensions ||
+      !selectedMirrorContext
     ) {
       alert('Invalid selection state detected. Please reselect options and try again.');
       return;
@@ -289,19 +315,29 @@ const DarkSelfiePromptGenerator = () => {
     }
 
     generationTimeoutRef.current = setTimeout(() => {
+      const mirrorContextLine =
+        selectedCameraStyle.value === 'mirror_selfie' ? selectedMirrorContext.prompt : null;
+      const identityLockLine = formData.identity_lock
+        ? 'Preserve the exact same person and identity from the reference image.'
+        : null;
       const prompt = [
         `${selectedCameraStyle.intro} of a ${selectedGender.subject} wearing a casual ${formData.tshirt} t-shirt.`,
         `${selectedGender.expression}.`,
         `${selectedCameraStyle.pose}`,
         `The background is ${selectedBackground.scene}.`,
+        mirrorContextLine,
         `The scene is illuminated by ${selectedLighting.prompt}.`,
+        identityLockLine,
         'Amateur photography aesthetic, slightly off-center composition, natural skin texture with visible pores and slight blemishes, casual messy hair, minor motion blur on the edges of the frame, unfiltered iPhone 15 quality.'
-      ].join(' ');
+      ]
+        .filter(Boolean)
+        .join(' ');
 
       const payload = {
         prompt,
         width: selectedDimensions.width,
-        height: selectedDimensions.height
+        height: selectedDimensions.height,
+        negative_prompt: formData.negative_prompt.trim()
       };
 
       setGeneratedPrompt(prompt);
@@ -481,6 +517,26 @@ const DarkSelfiePromptGenerator = () => {
               </div>
             </div>
 
+            {formData.camera_style === 'mirror_selfie' && (
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
+                  <span className="text-cyan-400">🪞</span> Mirror Context
+                </h3>
+                <select
+                  value={formData.mirror_context}
+                  onChange={(e) => handleInputChange('mirror_context', e.target.value)}
+                  title="Select mirror selfie context"
+                  className="w-full p-5 border-2 border-gray-600 rounded-2xl focus:border-cyan-400 focus:outline-none bg-gray-700/50 text-white text-lg backdrop-blur-sm transition-all duration-300 hover:border-gray-500"
+                >
+                  {mirrorContextOptions.map((option) => (
+                    <option key={option.value} value={option.value} className="bg-gray-800">
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="space-y-6">
               <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
                 <span className="text-cyan-400">🖼️</span> Background Setting
@@ -533,6 +589,38 @@ const DarkSelfiePromptGenerator = () => {
                   Lighting is filtered to match <span className="text-cyan-300 font-semibold">{selectedBackgroundOption.label}</span> so the prompt stays consistent.
                 </p>
               )}
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
+                <span className="text-cyan-400">🧬</span> Identity Reinforcement
+              </h3>
+              <label className="flex items-start gap-4 p-5 rounded-2xl border border-gray-600 bg-gray-700/30">
+                <input
+                  type="checkbox"
+                  checked={formData.identity_lock}
+                  onChange={(e) => handleInputChange('identity_lock', e.target.checked)}
+                  className="mt-1 h-5 w-5 accent-cyan-500"
+                />
+                <span className="text-gray-200">
+                  Add a strict identity-preservation line (recommended only when you are <strong>not</strong> using PuLID/ID controls).
+                </span>
+              </label>
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold flex items-center gap-3 text-white">
+                <span className="text-cyan-400">🚫</span> Negative Prompt
+              </h3>
+              <textarea
+                value={formData.negative_prompt}
+                onChange={(e) => handleInputChange('negative_prompt', e.target.value)}
+                className="w-full h-24 p-5 border-2 border-gray-600 rounded-2xl bg-gray-900/50 text-gray-100 text-sm resize-none backdrop-blur-sm focus:border-cyan-400 transition-colors"
+                placeholder="Optional negative prompt (stored in payload JSON)"
+              />
+              <p className="text-sm text-gray-300">
+                Included in the generated payload as <code>negative_prompt</code> for API compatibility.
+              </p>
             </div>
 
             <div className="space-y-6">
