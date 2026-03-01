@@ -1,5 +1,5 @@
 // @ts-ignore - React loaded via CDN in browser
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const orientationDimensions = {
   landscape: { width: 1152, height: 896, label: '1152 x 896' },
@@ -211,13 +211,22 @@ const DarkSelfiePromptGenerator = () => {
   const [showResults, setShowResults] = useState(false);
   const [copyMessage, setCopyMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const generationTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (generationTimeoutRef.current) {
+        clearTimeout(generationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleInputChange = (name, value) => {
     setFormData((prev) => {
       if (name === 'background') {
         const selectedBackground = backgroundOptions.find((option) => option.value === value);
         if (!selectedBackground) {
-          return { ...prev, background: value };
+          return { ...prev, background: value, lighting: '' };
         }
 
         const lightingStillCompatible = selectedBackground.lightingOptions.includes(prev.lighting);
@@ -252,19 +261,34 @@ const DarkSelfiePromptGenerator = () => {
     }
 
     const selectedGender = genderStyles[formData.gender];
-    const selectedCameraStyle =
-      cameraStyleOptions.find((option) => option.value === formData.camera_style) ||
-      cameraStyleOptions[0];
-    const selectedBackground =
-      backgroundOptions.find((option) => option.value === formData.background) ||
-      backgroundOptions[0];
-    const selectedLighting =
-      lightingOptions.find((option) => option.value === formData.lighting) || lightingOptions[0];
+    const selectedCameraStyle = cameraStyleOptions.find(
+      (option) => option.value === formData.camera_style
+    );
+    const selectedBackground = backgroundOptions.find(
+      (option) => option.value === formData.background
+    );
+    const selectedLighting = lightingOptions.find(
+      (option) => option.value === formData.lighting
+    );
     const selectedDimensions = orientationDimensions[formData.orientation];
 
-    setIsGenerating(true);
+    if (
+      !selectedGender ||
+      !selectedCameraStyle ||
+      !selectedBackground ||
+      !selectedLighting ||
+      !selectedDimensions
+    ) {
+      alert('Invalid selection state detected. Please reselect options and try again.');
+      return;
+    }
 
-    setTimeout(() => {
+    setIsGenerating(true);
+    if (generationTimeoutRef.current) {
+      clearTimeout(generationTimeoutRef.current);
+    }
+
+    generationTimeoutRef.current = setTimeout(() => {
       const prompt = [
         `${selectedCameraStyle.intro} of a ${selectedGender.subject} wearing a casual ${formData.tshirt} t-shirt.`,
         `${selectedGender.expression}.`,
@@ -284,6 +308,7 @@ const DarkSelfiePromptGenerator = () => {
       setGeneratedPayload(JSON.stringify(payload, null, 2));
       setShowResults(true);
       setIsGenerating(false);
+      generationTimeoutRef.current = null;
     }, 800);
   };
 
@@ -294,6 +319,8 @@ const DarkSelfiePromptGenerator = () => {
       setTimeout(() => setCopyMessage(''), 3000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
+      setCopyMessage(`Failed to copy ${label}. Please copy manually.`);
+      setTimeout(() => setCopyMessage(''), 3000);
     }
   };
 
@@ -468,7 +495,7 @@ const DarkSelfiePromptGenerator = () => {
                 <option value="" className="bg-gray-800">Choose a background setting...</option>
                 {Object.entries(groupedBackgrounds).map(([category, options]) => (
                   <optgroup key={category} label={category} className="bg-gray-800">
-                    {(options as typeof backgroundOptions).map((option) => (
+                    {options.map((option) => (
                       <option key={option.value} value={option.value} className="bg-gray-800">
                         {option.label}
                       </option>
@@ -571,8 +598,11 @@ const DarkSelfiePromptGenerator = () => {
             </h3>
             <div className="space-y-6">
               <div className="relative">
-                <label className="block text-sm font-semibold text-cyan-300 mb-2">FLUX Prompt</label>
+                <label htmlFor="flux-prompt-output" className="block text-sm font-semibold text-cyan-300 mb-2">
+                  FLUX Prompt
+                </label>
                 <textarea
+                  id="flux-prompt-output"
                   value={generatedPrompt}
                   readOnly
                   className="w-full h-64 p-6 border-2 border-gray-600 rounded-2xl bg-gray-900/50 text-gray-100 font-mono text-sm resize-none backdrop-blur-sm focus:border-cyan-400 transition-colors"
@@ -581,8 +611,11 @@ const DarkSelfiePromptGenerator = () => {
               </div>
 
               <div className="relative">
-                <label className="block text-sm font-semibold text-cyan-300 mb-2">Suggested API Payload (orientation applied as dimensions)</label>
+                <label htmlFor="flux-payload-output" className="block text-sm font-semibold text-cyan-300 mb-2">
+                  Suggested API Payload (orientation applied as dimensions)
+                </label>
                 <textarea
+                  id="flux-payload-output"
                   value={generatedPayload}
                   readOnly
                   className="w-full h-40 p-6 border-2 border-gray-600 rounded-2xl bg-gray-900/50 text-gray-100 font-mono text-sm resize-none backdrop-blur-sm focus:border-cyan-400 transition-colors"
@@ -625,7 +658,7 @@ const DarkSelfiePromptGenerator = () => {
 
         <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/30 rounded-2xl p-6 mt-8 text-center">
           <p className="text-gray-400 text-lg">
-            © 2026 AI Selfie Prompt Generator | Built for
+            © {new Date().getFullYear()} AI Selfie Prompt Generator | Built for
             <span className="text-cyan-400 font-semibold"> Black Forest Lab Flux/Konflux</span>
           </p>
           <div className="mt-2 flex items-center justify-center gap-4 text-sm text-gray-500">

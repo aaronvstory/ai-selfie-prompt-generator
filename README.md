@@ -23,7 +23,7 @@ The **AI Selfie Prompt Generator** is a specialized tool designed to create high
 - **🎯 Precision Targeting**: Optimized for Black Forest Lab Flux/Konflux models
 - **🔄 Authentic Results**: Includes natural imperfections to prevent "AI look"
 - **📱 Mobile-Responsive**: Beautiful dark mode interface works on all devices
-- **⚡ Lightning Fast**: Instant prompt generation with 4,032+ unique combinations
+- **⚡ Lightning Fast**: Instant prompt generation with scene-aware combinations
 - **🎨 Professional Quality**: Carefully crafted prompts for consistent results
 
 ## 🚀 **Why Use This Generator?**
@@ -40,7 +40,7 @@ The **AI Selfie Prompt Generator** is a specialized tool designed to create high
 - **Casual, candid** expressions and poses
 
 ### 🎨 **Professional Quality**
-- **4,032+ unique combinations** for endless variety
+- **Scene-aware combinations** with compatible background/lighting presets
 - **Categorized options** for easy selection
 - **Mobile-optimized** interface for on-the-go use
 - **Dark mode design** reduces eye strain
@@ -55,7 +55,7 @@ The **AI Selfie Prompt Generator** is a specialized tool designed to create high
 | Backgrounds | Indoor, Outdoor, Urban | 12 |
 | Lighting | Scene-compatible lighting presets | 7 |
 | T-shirt Colors | Color palette | 8 |
-| **Total Combinations** | Context-aware based on background/lighting compatibility | Variable |
+| **Total Combinations** | Scene-aware based on background/lighting compatibility | Variable |
 
 ## 🎮 **Usage Tips**
 
@@ -75,7 +75,7 @@ The **AI Selfie Prompt Generator** is a specialized tool designed to create high
 ### 🌐 **Online Usage**
 1. Visit the [live demo](https://aaronvstory.github.io/ai-selfie-prompt-generator/)
 2. Select your preferred options
-3. Click "Generate Prompt"
+3. Click "Generate Prompt + Payload"
 4. Copy and use in your AI image generator
 
 ### 💻 **Local Development**
